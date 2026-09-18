@@ -1,0 +1,7 @@
+{{define "summary"}}
+<div id="jar-summary" class="summary" aria-live="polite">
+  <span class="label">Amount owed</span>
+  <strong>{{.TotalAmount}}</strong>
+  <span class="count">{{.Count}} {{if eq .Count 1}}time{{else}}times{{end}} recorded</span>
+</div>
+{{end}}

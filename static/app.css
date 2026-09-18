@@ -1,0 +1,17 @@
+:root { --pico-font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+body { background: #fef3c7; color: #292524; }
+main { display: grid; min-height: 100vh; place-items: center; padding: 2rem 1.25rem; background: radial-gradient(circle at top, #fcd34d, #fef3c7 42%, #fffbeb); }
+.jar { width: min(100%, 34rem); padding: 3rem; text-align: center; background: rgb(255 255 255 / 88%); border: 1px solid #fde68a; border-radius: 1.5rem; box-shadow: 0 25px 50px -12px rgb(120 53 15 / 25%); }
+.eyebrow { margin: 0 0 .75rem; color: #b45309; font-size: .75rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+h1 { margin: 0; font-family: Georgia, serif; font-size: clamp(2.5rem, 9vw, 4.5rem); line-height: 1; color: #92400e; }
+.intro { margin: 1.25rem auto 2rem; max-width: 25rem; color: #57534e; line-height: 1.6; }
+.summary { display: grid; gap: .25rem; margin: 0 auto 2rem; padding: 1.5rem; border-radius: 1rem; background: #fffbeb; }
+.label { color: #78716c; font-size: .875rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.summary strong { color: #b45309; font-size: clamp(3rem, 12vw, 5rem); line-height: 1; }
+.count { color: #57534e; font-size: .875rem; }
+.contribute { width: 100%; margin: 0; padding: 1rem 1.5rem; border: 0; border-radius: .75rem; background: #b45309; font-size: 1.125rem; font-weight: 800; box-shadow: 0 4px 0 #78350f; }
+.contribute:hover { background: #92400e; }
+.contribute:active { transform: translateY(3px); box-shadow: 0 1px 0 #78350f; }
+.contribute:focus-visible { outline: 3px solid #fbbf24; outline-offset: 3px; }
+.small-print { margin: 1.5rem 0 0; color: #78716c; font-size: .75rem; }
+@media (max-width: 480px) { .jar { padding: 2rem 1.25rem; } }

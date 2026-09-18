@@ -1,0 +1,32 @@
+{{define "page"}}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Claude Says Jar</title>
+    <link rel="stylesheet" href="/static/pico.min.css">
+    <link rel="stylesheet" href="/static/app.css">
+    <script src="/static/htmx.min.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <section class="jar" aria-labelledby="title">
+        <p class="eyebrow">The virtual swear jar</p>
+        <h1 id="title">Claude Says</h1>
+        <p class="intro">Said it again? That is another five dollars for the jar.</p>
+        {{template "summary" .}}
+        <button
+          class="contribute"
+          type="button"
+          hx-post="/contributions"
+          hx-target="#jar-summary"
+          hx-swap="outerHTML">
+          Add $5 to the jar
+        </button>
+        <p class="small-print">$5 per “Claude Says”, or your equivalent phrase.</p>
+      </section>
+    </main>
+  </body>
+</html>
+{{end}}
