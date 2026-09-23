@@ -31,6 +31,16 @@ type jarSummary struct {
 	TotalAmount string
 }
 
+type weeklyContribution struct {
+	Label  string
+	Count  int
+	Height int
+}
+
+type contributionHistory struct {
+	Weeks []weeklyContribution
+}
+
 func main() {
 	db, err := openDatabase()
 	if err != nil {
@@ -47,6 +57,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.FS(mustSubFS(embeddedFiles, "static")))))
 	mux.HandleFunc("GET /", app.home)
+	mux.HandleFunc("GET /history", app.history)
 	mux.HandleFunc("POST /contributions", app.addContribution)
 
 	address := envOrDefault("JAR_ADDR", ":8080")
@@ -106,6 +117,15 @@ func (app *application) addContribution(w http.ResponseWriter, r *http.Request) 
 	render(w, app.templates, "summary", summary)
 }
 
+func (app *application) history(w http.ResponseWriter, r *http.Request) {
+	history, err := app.weeklyHistory(time.Now().UTC())
+	if err != nil {
+		http.Error(w, "Unable to load contribution history.", http.StatusInternalServerError)
+		return
+	}
+	render(w, app.templates, "history", history)
+}
+
 func (app *application) summary() (jarSummary, error) {
 	var summary jarSummary
 	if err := app.db.QueryRow(
@@ -115,6 +135,60 @@ func (app *application) summary() (jarSummary, error) {
 	}
 	summary.TotalAmount = "$" + strconv.Itoa(summary.TotalCents/100) + "." + twoDigits(summary.TotalCents%100)
 	return summary, nil
+}
+
+func (app *application) weeklyHistory(now time.Time) (contributionHistory, error) {
+	const numberOfWeeks = 8
+
+	currentWeek := startOfWeek(now)
+	firstWeek := currentWeek.AddDate(0, 0, -7*(numberOfWeeks-1))
+	rows, err := app.db.Query(`
+		SELECT date(created_at, '-' || ((CAST(strftime('%w', created_at) AS INTEGER) + 6) % 7) || ' days'), COUNT(*)
+		FROM contributions
+		WHERE created_at >= ?
+		GROUP BY 1
+	`, firstWeek.Format(time.RFC3339))
+	if err != nil {
+		return contributionHistory{}, err
+	}
+	defer rows.Close()
+
+	counts := make(map[string]int, numberOfWeeks)
+	for rows.Next() {
+		var week string
+		var count int
+		if err := rows.Scan(&week, &count); err != nil {
+			return contributionHistory{}, err
+		}
+		counts[week] = count
+	}
+	if err := rows.Err(); err != nil {
+		return contributionHistory{}, err
+	}
+
+	history := contributionHistory{Weeks: make([]weeklyContribution, 0, numberOfWeeks)}
+	maxCount := 1
+	for week := firstWeek; !week.After(currentWeek); week = week.AddDate(0, 0, 7) {
+		count := counts[week.Format("2006-01-02")]
+		if count > maxCount {
+			maxCount = count
+		}
+		history.Weeks = append(history.Weeks, weeklyContribution{
+			Label: week.Format("Jan 2"),
+			Count: count,
+		})
+	}
+	for index := range history.Weeks {
+		history.Weeks[index].Height = history.Weeks[index].Count * 100 / maxCount
+	}
+
+	return history, nil
+}
+
+func startOfWeek(value time.Time) time.Time {
+	day := time.Date(value.Year(), value.Month(), value.Day(), 0, 0, 0, 0, time.UTC)
+	daysSinceMonday := (int(day.Weekday()) + 6) % 7
+	return day.AddDate(0, 0, -daysSinceMonday)
 }
 
 func render(w http.ResponseWriter, templates *template.Template, name string, data any) {

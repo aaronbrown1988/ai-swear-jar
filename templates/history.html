@@ -1,0 +1,36 @@
+{{define "history"}}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Weekly Claude Says | Claude Says Jar</title>
+    <link rel="stylesheet" href="/static/pico.min.css">
+    <link rel="stylesheet" href="/static/app.css">
+  </head>
+  <body>
+    <main>
+      <section class="jar history" aria-labelledby="title">
+        <p class="eyebrow">The virtual swear jar</p>
+        <h1 id="title">Claude Says by week</h1>
+        <p class="intro">The last eight weeks of contributions.</p>
+        <figure class="weekly-chart" aria-labelledby="chart-caption">
+          <div class="chart-bars" role="img" aria-label="Claude Says contributions per week">
+            {{range .Weeks}}
+            <div class="chart-week">
+              <span class="chart-count">{{.Count}}</span>
+              <div class="chart-bar-track">
+                <div class="chart-bar" style="height: {{.Height}}%" aria-hidden="true"></div>
+              </div>
+              <span class="chart-label">{{.Label}}</span>
+            </div>
+            {{end}}
+          </div>
+          <figcaption id="chart-caption">Claude Says recorded each week, beginning Monday.</figcaption>
+        </figure>
+        <a class="back-link" href="/">Back to the jar</a>
+      </section>
+    </main>
+  </body>
+</html>
+{{end}}

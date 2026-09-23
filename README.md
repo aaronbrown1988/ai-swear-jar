@@ -9,6 +9,7 @@ go run .
 ```
 
 Open `http://localhost:8080`. Each click records a $5 contribution in `jar.db`.
+Use the **View Claude Says by week** link to see a server-rendered, CSS-only bar graph for the most recent eight weeks.
 
 ## Build a deployable binary
 
